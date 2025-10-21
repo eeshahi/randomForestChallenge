@@ -17,13 +17,6 @@ Navigate to the [Student Analysis Section](#student-analysis-section) to see the
 
 :::
 
-::: {.callout-important}
-## 🎯 Note on Python Usage
-
-You have not been coached through setting up a Python environment.  **If using Python** You will need to set up a Python environment and install the necessary packages to run this code - takes about 15 minutes; see [https://quarto.org/docs/projects/virtual-environments.html](https://quarto.org/docs/projects/virtual-environments.html).  Alternatively, delete the Python code and only leave the remaining R code that is provided.  You can see the executed Python output at my GitHub pages site: [https://flyaflya.github.io/randomForestChallenge/](https://flyaflya.github.io/randomForestChallenge/).
-
-:::
-
 ## The Problem: Can Many Weak Learners Beat One Strong Learner?
 
 **Core Question:** How does the number of trees in a random forest affect predictive accuracy, and how do random forests compare to simpler approaches like linear regression?
@@ -31,14 +24,6 @@ You have not been coached through setting up a Python environment.  **If using P
 **The Challenge:** Individual decision trees are "weak learners" with limited predictive power. Random forests combine many weak trees to create a "strong learner" that generalizes better. But how many trees do we need? Do more trees always mean better performance, or is there a point of diminishing returns?
 
 **Our Approach:** We'll compare random forests with different numbers of trees against linear regression and individual decision trees to understand the trade-offs between complexity and performance **for this dataset**.
-
-::: {.callout-warning}
-## ⚠️ AI Partnership Required
-
-This challenge pushes boundaries intentionally. You'll tackle problems that normally require weeks of study, but with Cursor AI as your partner (and your brain keeping it honest), you can accomplish more than you thought possible.
-
-**The new reality:** The four stages of competence are Ignorance → Awareness → Learning → Mastery. AI lets us produce Mastery-level work while operating primarily in the Awareness stage. I focus on awareness training, you leverage AI for execution, and together we create outputs that used to require years of dedicated study.
-:::
 
 ## Data and Methodology
 
@@ -244,14 +229,14 @@ The visualizations reveal a compelling story about ensemble learning:
 
 library(rpart)
 
-# Build decision trees with different max depths
-dt_depths <- c(1, 3, 5, 10, 15, 20, 25, 30)
+# Build decision trees with different max depths - using more granular depths to show overfitting curve
+dt_depths <- c(1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30)
 dt_train_rmse <- numeric(length(dt_depths))
 dt_test_rmse <- numeric(length(dt_depths))
 
 for (i in seq_along(dt_depths)) {
   dt_model <- rpart(SalePrice ~ ., data = train_data, 
-                    control = rpart.control(maxdepth = dt_depths[i], cp = 0))
+                    control = rpart.control(maxdepth = dt_depths[i], cp = 0, minsplit = 2, minbucket = 1))
   
   # Training predictions
   dt_pred_train <- predict(dt_model, train_data)
@@ -427,79 +412,7 @@ The comparison table reveals critical insights about the trade-offs between mode
    - Your site will be available at: `https://[your-username].github.io/randomForestChallenge/`
    - **Note:** It may take a few minutes for the site to become available after enabling Pages
 
-## Getting Started: Repository Setup 🚀
 
-::: {.callout-important}
-## 📁 Quick Start with Starter Repository
-
-**Step 1:** Fork the starter repository to your github account at [https://github.com/flyaflya/randomForestChallenge.git](https://github.com/flyaflya/randomForestChallenge.git)
-
-**Step 2:** Clone your fork locally using Cursor (or VS Code)
-
-**Step 3:** You're ready to start! The repository includes pre-loaded data and a working template with all the analysis above.
-:::
-
-::: {.callout-tip}
-## 💡 Why Use the Starter Repository?
-
-**Benefits:**
-
-- **Pre-loaded data:** All required data and analysis code is included
-- **Working template:** Basic Quarto structure (`index.qmd`) is ready
-- **No setup errors:** Avoid common data loading issues
-- **Focus on analysis:** Spend time on the visualizations and analysis, not data preparation
-:::
-
-### Getting Started Tips
-
-::: {.callout-note}
-## 🎯 Navy SEALs Motto
-
-> "Slow is Smooth and Smooth is Fast"
-
-*Take your time to understand the random forest mechanics, plan your approach carefully, and execute with precision. Rushing through this challenge will only lead to errors and confusion.*
-:::
-
-::: {.callout-warning}
-## 💾 Important: Save Your Work Frequently!
-
-**Before you start:** Make sure to commit your work often using the Source Control panel in Cursor (Ctrl+Shift+G or Cmd+Shift+G). This prevents the AI from overwriting your progress and ensures you don't lose your work.
-
-**Commit after each major step:**
-
-- After adding your visualizations
-- After adding your analysis
-- After rendering to HTML
-- Before asking the AI for help with new code
-
-**How to commit:**
-
-1. Open Source Control panel (Ctrl+Shift+G)
-2. Stage your changes (+ button)
-3. Write a descriptive commit message
-4. Click the checkmark to commit
-
-*Remember: Frequent commits are your safety net!*
-:::
-
-## Grading Rubric 🎓
-
-::: {.callout-important}
-## 📊 What You're Really Being Graded On
-
-**This is an investigative report, not a coding exercise.** You're analyzing random forest models and reporting your findings like a professional analyst would. Think of this as a brief you'd write for a client or manager about the power of ensemble learning and when to use random forests vs simpler approaches.
-
-**What makes a great report:**
-
-- **Clear narrative:** Tell the story of what you discovered about ensemble learning
-- **Insightful analysis:** Focus on the most interesting findings about random forest performance
-- **Professional presentation:** Clean, readable, and engaging
-- **Concise conclusions:** No AI babble or unnecessary technical jargon
-- **Human insights:** Your interpretation of what the performance improvements actually mean
-- **Practical implications:** When random forests are worth the added complexity
-
-**What we're looking for:** A compelling 2-3 minute read that demonstrates both the power of ensemble learning and the importance of choosing the right tool for the job.
-:::
 
 ### Questions to Answer for 75% Grade on Challenge
 
