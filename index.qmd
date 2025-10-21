@@ -52,7 +52,7 @@ Since we anticipate non-linear relationships, random forests are well-suited to 
 
 ```{r}
 #| label: load-and-model-r
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 
@@ -99,7 +99,7 @@ Our analysis reveals a clear pattern: **more trees consistently improve performa
 
 ```{r}
 #| label: performance-comparison-r
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 #| fig-width: 10
@@ -246,27 +246,121 @@ Use log scale on x-axis to better show the relationship across the range of tree
 
 ### 2. Overfitting Visualization and Analysis
 
-**Your Task:** Compare decision trees vs random forests in terms of overfitting!
+```{r}
+#| label: overfitting-data-prep
+#| echo: false
+#| message: false
+#| warning: false
 
-**Create one visualization with two side-by-side plots showing:**
-- Decision trees: How performance changes with tree complexity (max depth)
-- Random forests: How performance changes with number of trees
+library(rpart)
 
-**Your analysis should explain:**
-- Why individual decision trees overfit as they become more complex
-- Why random forests don't suffer from the same overfitting problem
-- The mechanisms that prevent overfitting in random forests (bootstrap sampling, random feature selection, averaging)
+# Build decision trees with different max depths
+dt_depths <- c(1, 3, 5, 10, 15, 20, 25, 30)
+dt_train_rmse <- numeric(length(dt_depths))
+dt_test_rmse <- numeric(length(dt_depths))
 
-::: {.callout-important}
-## 📊 Overfitting Analysis Requirements
+for (i in seq_along(dt_depths)) {
+  dt_model <- rpart(SalePrice ~ ., data = train_data, 
+                    control = rpart.control(maxdepth = dt_depths[i], cp = 0))
+  
+  # Training predictions
+  dt_pred_train <- predict(dt_model, train_data)
+  dt_train_rmse[i] <- sqrt(mean((train_data$SalePrice - dt_pred_train)^2))
+  
+  # Test predictions
+  dt_pred_test <- predict(dt_model, test_data)
+  dt_test_rmse[i] <- sqrt(mean((test_data$SalePrice - dt_pred_test)^2))
+}
 
-Create a side-by-side comparison showing:
-1. **Decision Trees:** Training vs Test RMSE as max depth increases (showing overfitting)
-2. **Random Forests:** Training vs Test RMSE as number of trees increases (no overfitting)
+# Create data frame for decision trees
+dt_df <- data.frame(
+  Depth = dt_depths,
+  Train_RMSE = dt_train_rmse,
+  Test_RMSE = dt_test_rmse
+)
 
-- Use the same y-axis limits for both side-by-side plots so it clearly shows whether random forests outperform decision trees.
-- Do not `echo` the code that creates the visualization
-:::
+# Create data frame for random forests (using subset of our existing data)
+rf_subset_df <- data.frame(
+  Trees = c(1, 5, 25, 100, 500, 1000),
+  Train_RMSE = c(rmse_1_train, rmse_5_train, rmse_25_train, rmse_100_train, rmse_500_train, rmse_1000_train),
+  Test_RMSE = c(rmse_1_test, rmse_5_test, rmse_25_test, rmse_100_test, rmse_500_test, rmse_1000_test)
+)
+```
+
+```{r}
+#| label: overfitting-visualization
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 12
+#| fig-height: 5
+
+library(ggplot2)
+library(gridExtra)
+
+# Determine common y-axis limits
+all_rmse <- c(dt_df$Train_RMSE, dt_df$Test_RMSE, rf_subset_df$Train_RMSE, rf_subset_df$Test_RMSE)
+y_min <- min(all_rmse) * 0.95
+y_max <- max(all_rmse) * 1.05
+
+# Decision Tree Plot
+p1 <- ggplot(dt_df, aes(x = Depth)) +
+  geom_line(aes(y = Train_RMSE, color = "Train"), linewidth = 1.2) +
+  geom_point(aes(y = Train_RMSE, color = "Train"), size = 3) +
+  geom_line(aes(y = Test_RMSE, color = "Test"), linewidth = 1.2) +
+  geom_point(aes(y = Test_RMSE, color = "Test"), size = 3) +
+  scale_color_manual(values = c("Train" = "#3498DB", "Test" = "#E74C3C")) +
+  coord_cartesian(ylim = c(y_min, y_max)) +
+  labs(
+    title = "Decision Trees: Overfitting Problem",
+    x = "Maximum Depth",
+    y = "RMSE ($)",
+    color = "Dataset"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold", size = 12)
+  )
+
+# Random Forest Plot
+p2 <- ggplot(rf_subset_df, aes(x = Trees)) +
+  geom_line(aes(y = Train_RMSE, color = "Train"), linewidth = 1.2) +
+  geom_point(aes(y = Train_RMSE, color = "Train"), size = 3) +
+  geom_line(aes(y = Test_RMSE, color = "Test"), linewidth = 1.2) +
+  geom_point(aes(y = Test_RMSE, color = "Test"), size = 3) +
+  scale_x_log10(breaks = c(1, 5, 25, 100, 500, 1000)) +
+  scale_color_manual(values = c("Train" = "#3498DB", "Test" = "#E74C3C")) +
+  coord_cartesian(ylim = c(y_min, y_max)) +
+  labs(
+    title = "Random Forests: No Overfitting",
+    x = "Number of Trees (log scale)",
+    y = "RMSE ($)",
+    color = "Dataset"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold", size = 12)
+  )
+
+# Display side-by-side
+grid.arrange(p1, p2, ncol = 2)
+```
+
+#### Analysis: Why Random Forests Avoid Overfitting
+
+The side-by-side comparison reveals a fundamental difference in how these models behave:
+
+**Decision Trees: The Overfitting Problem** The left plot shows the classic overfitting pattern. As tree depth increases, training RMSE plummets—the tree memorizes the training data perfectly. But test RMSE initially improves, then plateaus or worsens. At maximum depth, the gap between training and test error becomes dramatic. The model has learned the noise in the training data, not the underlying pattern, making it unreliable for new predictions.
+
+**Random Forests: Built-in Overfitting Protection** The right plot tells a completely different story. Both training and test RMSE improve together as we add trees, with no widening gap. Random forests avoid overfitting through three key mechanisms:
+
+1. **Bootstrap Sampling**: Each tree trains on a different random sample of the data, ensuring no single tree can memorize the entire dataset
+2. **Random Feature Selection**: At each split, trees consider only a random subset of features, forcing diversity in how trees make decisions
+3. **Averaging Predictions**: Individual trees may overfit in different ways, but averaging their predictions cancels out these idiosyncratic errors
+
+**The Bottom Line**: Individual decision trees face a painful trade-off between fitting the data and generalizing to new cases. Random forests elegantly sidestep this dilemma—you can keep adding trees without fear of overfitting, as each new tree adds signal while the averaging process filters out noise.
 
 ### 3. Linear Regression vs Random Forest Comparison
 

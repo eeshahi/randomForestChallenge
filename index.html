@@ -20,41 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -158,44 +123,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Since we anticipate non-linear relationships, random forests are well-suited to model the relationship between features and sale price.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load libraries</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(tidyverse))</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(randomForest))</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>sales_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://raw.githubusercontent.com/flyaflya/buad442Fall2025/refs/heads/main/datasets/salesPriceData.csv"</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare model data</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>model_data <span class="ot">&lt;-</span> sales_data <span class="sc">%&gt;%</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SalePrice, LotArea, YearBuilt, GrLivArea, FullBath, HalfBath, </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>         BedroomAbvGr, TotRmsAbvGrd, GarageCars, zipCode) <span class="sc">%&gt;%</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert zipCode to factor (categorical variable) - important for proper modeling</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">zipCode =</span> <span class="fu">as.factor</span>(zipCode)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Data prepared with zipCode as categorical variable</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Data prepared with zipCode as categorical variable</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of unique zip codes:"</span>, <span class="fu">length</span>(<span class="fu">unique</span>(model_data<span class="sc">$</span>zipCode)), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Number of unique zip codes: 25 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split data</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>train_indices <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(model_data), <span class="fl">0.8</span> <span class="sc">*</span> <span class="fu">nrow</span>(model_data))</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>train_data <span class="ot">&lt;-</span> model_data[train_indices, ]</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> model_data[<span class="sc">-</span>train_indices, ]</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Build random forests with different numbers of trees (with corrected categorical zipCode)</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>rf_1 <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train_data, <span class="at">ntree =</span> <span class="dv">1</span>, <span class="at">mtry =</span> <span class="dv">3</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>rf_5 <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train_data, <span class="at">ntree =</span> <span class="dv">5</span>, <span class="at">mtry =</span> <span class="dv">3</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>rf_25 <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train_data, <span class="at">ntree =</span> <span class="dv">25</span>, <span class="at">mtry =</span> <span class="dv">3</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>rf_100 <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train_data, <span class="at">ntree =</span> <span class="dv">100</span>, <span class="at">mtry =</span> <span class="dv">3</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>rf_500 <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train_data, <span class="at">ntree =</span> <span class="dv">500</span>, <span class="at">mtry =</span> <span class="dv">3</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>rf_1000 <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train_data, <span class="at">ntree =</span> <span class="dv">1000</span>, <span class="at">mtry =</span> <span class="dv">3</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>rf_2000 <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train_data, <span class="at">ntree =</span> <span class="dv">2000</span>, <span class="at">mtry =</span> <span class="dv">3</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>rf_5000 <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(SalePrice <span class="sc">~</span> ., <span class="at">data =</span> train_data, <span class="at">ntree =</span> <span class="dv">5000</span>, <span class="at">mtry =</span> <span class="dv">3</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="results-the-power-of-ensemble-learning" class="level2">
@@ -204,65 +137,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="performance-trends" class="level3">
 <h3 class="anchored" data-anchor-id="performance-trends">Performance Trends</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate predictions and performance metrics for test data</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>predictions_1_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_1, test_data)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>predictions_5_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_5, test_data)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>predictions_25_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_25, test_data)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>predictions_100_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_100, test_data)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>predictions_500_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_500, test_data)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>predictions_1000_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_1000, test_data)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>predictions_2000_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_2000, test_data)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>predictions_5000_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_5000, test_data)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate predictions for training data</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>predictions_1_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_1, train_data)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>predictions_5_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_5, train_data)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>predictions_25_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_25, train_data)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>predictions_100_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_100, train_data)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>predictions_500_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_500, train_data)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>predictions_1000_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_1000, train_data)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>predictions_2000_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_2000, train_data)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>predictions_5000_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_5000, train_data)</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate RMSE for test data</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>rmse_1_test <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_1_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>rmse_5_test <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_5_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>rmse_25_test <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_25_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>rmse_100_test <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_100_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>rmse_500_test <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_500_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>rmse_1000_test <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_1000_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>rmse_2000_test <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_2000_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>rmse_5000_test <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_5000_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate RMSE for training data</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>rmse_1_train <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((train_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_1_train)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>rmse_5_train <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((train_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_5_train)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>rmse_25_train <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((train_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_25_train)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>rmse_100_train <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((train_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_100_train)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>rmse_500_train <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((train_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_500_train)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>rmse_1000_train <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((train_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_1000_train)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>rmse_2000_train <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((train_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_2000_train)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>rmse_5000_train <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((train_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_5000_train)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate R-squared</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>r2_1 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_1_test)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test_data<span class="sc">$</span>SalePrice))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>r2_5 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_5_test)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test_data<span class="sc">$</span>SalePrice))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>r2_25 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_25_test)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test_data<span class="sc">$</span>SalePrice))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>r2_100 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_100_test)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test_data<span class="sc">$</span>SalePrice))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>r2_500 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_500_test)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test_data<span class="sc">$</span>SalePrice))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>r2_1000 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_1000_test)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test_data<span class="sc">$</span>SalePrice))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>r2_2000 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_2000_test)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test_data<span class="sc">$</span>SalePrice))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>r2_5000 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> predictions_5000_test)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((test_data<span class="sc">$</span>SalePrice <span class="sc">-</span> <span class="fu">mean</span>(test_data<span class="sc">$</span>SalePrice))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Create performance comparison</span></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>performance_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">Trees =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">25</span>, <span class="dv">100</span>, <span class="dv">500</span>, <span class="dv">1000</span>, <span class="dv">2000</span>, <span class="dv">5000</span>),</span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">RMSE_Test =</span> <span class="fu">c</span>(rmse_1_test, rmse_5_test, rmse_25_test, rmse_100_test, rmse_500_test, rmse_1000_test, rmse_2000_test, rmse_5000_test),</span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">RMSE_Train =</span> <span class="fu">c</span>(rmse_1_train, rmse_5_train, rmse_25_train, rmse_100_train, rmse_500_train, rmse_1000_train, rmse_2000_train, rmse_5000_train),</span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>  <span class="at">R_squared =</span> <span class="fu">c</span>(r2_1, r2_5, r2_25, r2_100, r2_500, r2_1000, r2_2000, r2_5000)</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(performance_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Trees RMSE_Test RMSE_Train R_squared
 1     1  42548.89   28137.39 0.7153393
@@ -315,26 +189,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="overfitting-visualization-and-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="overfitting-visualization-and-analysis">2. Overfitting Visualization and Analysis</h3>
-<p><strong>Your Task:</strong> Compare decision trees vs random forests in terms of overfitting!</p>
-<p><strong>Create one visualization with two side-by-side plots showing:</strong> - Decision trees: How performance changes with tree complexity (max depth) - Random forests: How performance changes with number of trees</p>
-<p><strong>Your analysis should explain:</strong> - Why individual decision trees overfit as they become more complex - Why random forests don’t suffer from the same overfitting problem - The mechanisms that prevent overfitting in random forests (bootstrap sampling, random feature selection, averaging)</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>📊 Overfitting Analysis Requirements
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/overfitting-visualization-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<p>Create a side-by-side comparison showing: 1. <strong>Decision Trees:</strong> Training vs Test RMSE as max depth increases (showing overfitting) 2. <strong>Random Forests:</strong> Training vs Test RMSE as number of trees increases (no overfitting)</p>
-<ul>
-<li>Use the same y-axis limits for both side-by-side plots so it clearly shows whether random forests outperform decision trees.</li>
-<li>Do not <code>echo</code> the code that creates the visualization</li>
-</ul>
 </div>
-</div>
+<section id="analysis-why-random-forests-avoid-overfitting" class="level4">
+<h4 class="anchored" data-anchor-id="analysis-why-random-forests-avoid-overfitting">Analysis: Why Random Forests Avoid Overfitting</h4>
+<p>The side-by-side comparison reveals a fundamental difference in how these models behave:</p>
+<p><strong>Decision Trees: The Overfitting Problem</strong> The left plot shows the classic overfitting pattern. As tree depth increases, training RMSE plummets—the tree memorizes the training data perfectly. But test RMSE initially improves, then plateaus or worsens. At maximum depth, the gap between training and test error becomes dramatic. The model has learned the noise in the training data, not the underlying pattern, making it unreliable for new predictions.</p>
+<p><strong>Random Forests: Built-in Overfitting Protection</strong> The right plot tells a completely different story. Both training and test RMSE improve together as we add trees, with no widening gap. Random forests avoid overfitting through three key mechanisms:</p>
+<ol type="1">
+<li><strong>Bootstrap Sampling</strong>: Each tree trains on a different random sample of the data, ensuring no single tree can memorize the entire dataset</li>
+<li><strong>Random Feature Selection</strong>: At each split, trees consider only a random subset of features, forcing diversity in how trees make decisions</li>
+<li><strong>Averaging Predictions</strong>: Individual trees may overfit in different ways, but averaging their predictions cancels out these idiosyncratic errors</li>
+</ol>
+<p><strong>The Bottom Line</strong>: Individual decision trees face a painful trade-off between fitting the data and generalizing to new cases. Random forests elegantly sidestep this dilemma—you can keep adding trees without fear of overfitting, as each new tree adds signal while the averaging process filters out noise.</p>
+</section>
 </section>
 <section id="linear-regression-vs-random-forest-comparison" class="level3">
 <h3 class="anchored" data-anchor-id="linear-regression-vs-random-forest-comparison">3. Linear Regression vs Random Forest Comparison</h3>
