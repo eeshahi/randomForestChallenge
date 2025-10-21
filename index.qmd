@@ -246,7 +246,7 @@ Use log scale on x-axis to better show the relationship across the range of tree
 
 ### 2. Overfitting Visualization and Analysis
 
-**Your Task:** Compare decision trees vs random forests in terms of overfitting.
+**Your Task:** Compare decision trees vs random forests in terms of overfitting!
 
 **Create one visualization with two side-by-side plots showing:**
 - Decision trees: How performance changes with tree complexity (max depth)
