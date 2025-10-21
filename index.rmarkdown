@@ -391,3 +391,4 @@ The comparison table reveals critical insights about the trade-offs between mode
 - **Random Forest (100-500 trees)**: Choose when prediction accuracy matters more than interpretability, when you suspect non-linear relationships, or when you have mixed data types. The performance gain often justifies the added complexity, especially in high-stakes applications like real estate valuation, credit scoring, or medical diagnosis.
 
 **The Interpretability-Performance Trade-off**: Linear regression offers clear coefficients that business stakeholders can interpret ("each additional bathroom adds $X to the price"). Random forests sacrifice this transparency for superior predictive power. The right choice depends on your use case: Are you trying to explain what drives prices, or predict them as accurately as possible? Both are valuable—just for different purposes.
+
